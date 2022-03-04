@@ -14,7 +14,7 @@ const BuyModal = (props) => {
             <div className="modal-footer">
                <button className="btn-submit" onClick={() => props.buyNFT()}>Accept</button>
                <button className="btn-close" onClick={() => props.closeOffer()}>Close Offer</button>
-               <button className="btn-cancel" onClick={() => props.setIsOpened(false)}>Close</button>
+               <button className="btn-cancel" onClick={() => props.setIsOpened(false)}>Cancel</button>
             </div>
          </div>
       </div>

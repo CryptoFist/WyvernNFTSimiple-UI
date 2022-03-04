@@ -1,20 +1,17 @@
-// import react from "react";
 import Web3 from 'web3';
 import TokenABI from "../../contract/azuki.abi.json";
-// import StaticMarketABI from "../../contract/staticmarket.abi.json";
-// import WyvernAtomicizerABI from "../../contract/wyvernatomicizer.abi.json";
 import WyvernExchangeABI from "../../contract/wyvernexchange.abi.json";
 import WyvernRegisteryABI from "../../contract/wyvernregistry.abi.json";
 import ERC20MockABI from "../../contract/erc20mock.abi.json";
 import { toWei } from "web3-utils";
 const {wrap, ZERO_BYTES32, parseSig} = require('../util');
 
-const nftContractAddress = "0xdf5c681BE2A970AA372a637dA4ABec03Cdd4a4c8";
+const nftContractAddress = "0xFc329a205BeE5657989EBc411AaC777D871a8F35";
+const erc20ContractAddress = "0x33c71aE8e27c3eb99cDE3E24f6d775fda3C144DC";
 const staticContractAddress = "0xd623c287cc1a58FA834113ED40c92850Ad73E09B";
-// const atomicizerContractAddress = "0x0b6E4DEeB343d5A9bd5E1559F07031E15F163a86";
 const exchangeContractAddress = "0x8F27ee79a16649194987AA0356F32A1b72a8fDb2";
 const registeryContractAddress = "0x1EBD745019953E892b5f95e8a79A1F626Ac46FA5";
-const erc20ContractAddress = "0x33c71aE8e27c3eb99cDE3E24f6d775fda3C144DC";
+// const atomicizerContractAddress = "0x0b6E4DEeB343d5A9bd5E1559F07031E15F163a86";
 
 export const isMetamaskDecteced = async () => {
   try {
@@ -301,9 +298,12 @@ export const tradeNFT = async (tokenId, price) => {
             gas: 3000000
          });
       }
+      return true;
    } catch(e) {
       console.log(e);
    }
+
+   return false;
 }
 
 export const closeOffering = async (tokenId) => {
@@ -351,10 +351,14 @@ export const placeOffering = async (tokenId, price) => {
          console.log("proxy is ", proxy);
 
          // approve tokenId to sell the NFT of tokenId
-         // await contract.methods.approve(proxy, tokenId).send({
-         //    from: walletAddress,
-         //    gas: 3000000
-         // });
+         const toAddress = await contract.methods.getApproved(tokenId).call();
+         console.log("toAddress is ", toAddress);
+         if (toAddress !== proxy) {
+            await contract.methods.approve(proxy, tokenId).send({
+               from: walletAddress,
+               gas: 3000000
+            });
+         }
 
          const selectorOne = web3.eth.abi.encodeFunctionSignature('ERC721ForERC20(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
          const paramsOne = web3.eth.abi.encodeParameters(

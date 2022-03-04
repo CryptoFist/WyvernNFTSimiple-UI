@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { setInterval } from 'timers';
 import './App.scss';
-import {connectWallet, getOwnedNFT, mintNFT, getOfferedNFT, placeOffering, tradeNFT, closeOffering } from './utils/walletConnect/metamaskConnect';
 import SaleModal from './component/modal/sale.modal.component';
 import BuyModal from './component/modal/buy.modal.component';
+import {connectWallet, getOwnedNFT, mintNFT, getOfferedNFT, placeOffering, tradeNFT, closeOffering } from './utils/walletConnect/metamaskConnect';
 
 function App() {
   const [walletAddress, setWalletAddress] = useState("Connect");
@@ -23,6 +24,7 @@ function App() {
 
   useEffect(() => {
     initData();
+    setInterval(initData, 1500);
     window.ethereum.on("accountsChanged", (accounts) => {
       if (accounts.length > 0) {
       } else {
@@ -112,7 +114,12 @@ function App() {
   const buyNFT = async () => {
     try {
       alert("Do you want to buy NFT?");
-      await tradeNFT(selectedNFT.tokenID, selectedNFT.price);
+      const succeed = await tradeNFT(selectedNFT.tokenID, selectedNFT.price);
+      if (succeed === true) {
+        await getNFTOffered();
+        await getOwnedNFT();
+        setSaleModalOpened(false);
+      }
     } catch(e) {
       console.log(e);
     }
@@ -151,7 +158,7 @@ function App() {
               offeredNFT.map(item => (
                 <li className="div-offered" key={item.tokenID} onClick={() => listBuyOffering(item)}>
                   <p className="txt-name">{item.title}</p>
-                  <p className="txt-price">{item.price}</p>
+                  <p className="txt-price">{item.price}(TST)</p>
                 </li>
               ))
             }
