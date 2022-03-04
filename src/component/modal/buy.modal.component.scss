@@ -1,0 +1,48 @@
+.buy-modal {
+   position: fixed;
+   top: 0;
+   right: 0;
+   bottom: 0;
+   left: 0;
+
+   background-color: rgba(0, 0, 0, 0.5);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   &.opened {
+      display: flex;
+   }
+
+   &.closed {
+      display: none;
+   }
+
+   .modal-content {
+      width: 500px;
+      background-color: white;
+
+      .modal-header {
+         padding: 10px;
+         .modal-title {
+            color: black;
+            text-align: center;
+         }
+      }
+   
+      .modal-footer {
+         padding: 10px;
+         display: flex;
+         flex-wrap: wrap;
+         justify-content: center;
+
+         .btn-submit {
+            margin-right: 50px;
+         }
+
+         .btn-cancel {
+            margin-left: 50px;
+         }
+      }
+   }
+}

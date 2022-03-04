@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
-import { AbiItem, toWei } from 'web3-utils';
-import Web3 from 'web3';
 import './App.scss';
-import { pinJSONToIPFS } from './minter';
-import nftContract from "./contract/token.abi.json";
-import { walletConnection, connectWallet, getOwnedNFT, mintNFT, setBaseURI, getOfferedNFT, placeOffering } from './utils/walletConnect/metamaskConnect';
+import {connectWallet, getOwnedNFT, mintNFT, getOfferedNFT, placeOffering, tradeNFT, closeOffering } from './utils/walletConnect/metamaskConnect';
 import SaleModal from './component/modal/sale.modal.component';
+import BuyModal from './component/modal/buy.modal.component';
 
 function App() {
   const [walletAddress, setWalletAddress] = useState("Connect");
@@ -14,22 +11,12 @@ function App() {
   const [offeredNFT, setOfferedNFT] = useState(undefined);
   const [nftPrice, setNFTPrice] = useState(0);
   const [saleModalOpened, setSaleModalOpened] = useState(false);
+  const [buyModalOpened, setBuyModalOpened] = useState(false);
   const [selectedNFT, setSelectedNFT] = useState();
-  let curWalletAddress = "";
-
-  const contractAddress = "0x1c5202f478FE8360Ff05250755069935D3B7f6E7";
-  const web3js = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/c9cd2f00130e437a9ea32928c21f554d'));
-
-  async function checkAccount() {
-    let web3 = new Web3(window.ethereum);
-    const accounts = await web3.eth.getAccounts();
-    curWalletAddress = accounts[0];
-    setWalletAddress(curWalletAddress);
-  }
 
   const walletConnect = async() => {
     const walletAddress = await connectWallet();
-    if (walletAddress != undefined) {
+    if (walletAddress !== undefined) {
       setWalletAddress(walletAddress);
     }
   }
@@ -57,7 +44,6 @@ function App() {
   const getNFTs = async () => {
     try {
       const ownedNFTs = await getOwnedNFT();
-      console.log(ownedNFTs);
       setOwnedNFT(ownedNFTs);
     } catch (e) {
       console.log(e);
@@ -67,7 +53,6 @@ function App() {
   const getNFTOffered = async () => {
     try {
       const offeredNFT = await getOfferedNFT();
-      console.log(offeredNFT);
       setOfferedNFT(offeredNFT);
     } catch (e) {
       console.log(e);
@@ -95,10 +80,39 @@ function App() {
     setSaleModalOpened(true);
   }
 
+  const listBuyOffering = (item) => {
+    setSelectedNFT(item);
+    setBuyModalOpened(true);
+  }
+
   const saleNFT = async () => {
     try {
-      await placeOffering(selectedNFT.tokenID, nftPrice);
-      await getNFTOffered();
+      const succeed = await placeOffering(selectedNFT.tokenID, nftPrice);
+      if (succeed === true) {
+        await getNFTOffered();
+        setSaleModalOpened(false);
+      }
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  const closeOffer = async () => {
+    try {
+      const succeed = await closeOffering(selectedNFT.tokenID);
+      if (succeed === true) {
+        await getNFTOffered();
+        setBuyModalOpened(false);
+      }
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  const buyNFT = async () => {
+    try {
+      alert("Do you want to buy NFT?");
+      await tradeNFT(selectedNFT.tokenID, selectedNFT.price);
     } catch(e) {
       console.log(e);
     }
@@ -122,7 +136,7 @@ function App() {
         <div className="div-detail">
           <ul className="div-userNFT">
             {
-              ownedNFT != undefined && 
+              ownedNFT !== undefined && 
               ownedNFT.map(item => (
                 <li className="sub-item" key={item.tokenID} onClick={() => listSaleOffering(item)}>
                   <p className="txt-name">{item.title}</p>
@@ -133,9 +147,9 @@ function App() {
 
           <ul className="div-saleNFT">
             {
-              offeredNFT != undefined && 
+              offeredNFT !== undefined && 
               offeredNFT.map(item => (
-                <li className="div-offered" key={item.tokenID}>
+                <li className="div-offered" key={item.tokenID} onClick={() => listBuyOffering(item)}>
                   <p className="txt-name">{item.title}</p>
                   <p className="txt-price">{item.price}</p>
                 </li>
@@ -152,6 +166,13 @@ function App() {
         isOpened = {saleModalOpened}
         setIsOpened = {setSaleModalOpened}
         saleNFT = {saleNFT}
+      />
+
+      <BuyModal 
+      isOpened = {buyModalOpened}
+      setIsOpened = {setBuyModalOpened}
+      closeOffer = {closeOffer}
+      buyNFT = {buyNFT}
       />
     </div>
   );

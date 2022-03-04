@@ -6,7 +6,7 @@ const SaleModal = (props) => {
       props.setNFTPrice(e.target.value);
    }
    return (
-      <div className={props.isOpened == false ? "sale-modal closed" : "sale-modal opened"}>
+      <div className={props.isOpened === false ? "sale-modal closed" : "sale-modal opened"}>
          <div className="modal-content">
             <div className="modal-header">
                <h4 className="modal-title">Sale Modal</h4>
