@@ -74,6 +74,12 @@
           cursor: pointer;
           opacity: 0.8;
 
+          &.sold {
+            background: red;
+            cursor: auto;
+            opacity: 1;
+          }
+
           &:hover {
             opacity: 1;
           }

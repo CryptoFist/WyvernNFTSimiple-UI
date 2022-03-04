@@ -6,7 +6,7 @@ import ERC20MockABI from "../../contract/erc20mock.abi.json";
 import { toWei } from "web3-utils";
 const {wrap, ZERO_BYTES32, parseSig} = require('../util');
 
-const nftContractAddress = "0xFc329a205BeE5657989EBc411AaC777D871a8F35";
+const nftContractAddress = "0x2cc375f106a855923c8b507b2d89b99fee289a9b";
 const erc20ContractAddress = "0x33c71aE8e27c3eb99cDE3E24f6d775fda3C144DC";
 const staticContractAddress = "0xd623c287cc1a58FA834113ED40c92850Ad73E09B";
 const exchangeContractAddress = "0x8F27ee79a16649194987AA0356F32A1b72a8fDb2";
@@ -105,7 +105,7 @@ export const getOwnedNFT = async () => {
          });
 
          for (let i = 0; i < ownedNFTTokenID.length; i ++) {
-            const tokenId = ownedNFTTokenID[i];
+            const tokenId = ownedNFTTokenID[i].tokenId;
             let tokenURI = await contract.methods.tokenURI(tokenId).call();
             tokenURI = tokenURI + ".json";
             const metaData = await fetch(tokenURI)
@@ -120,6 +120,7 @@ export const getOwnedNFT = async () => {
             tokenData.tokenID = tokenId;
             tokenData.title = metaData.title;
             tokenData.url = metaData.url;
+            tokenData.sold = ownedNFTTokenID[i].forSale;
             resp.push(tokenData);
          }
 
@@ -218,6 +219,7 @@ export const tradeNFT = async (tokenId, price) => {
          console.log("proxy is ", proxy);
 
          const allowance = await erc20Contract.methods.allowance(walletAddress, proxy).call();
+         console.log(allowance);
          if (allowance !== toWei(String(price), "ether")) {
             console.log("ERC20 approve function");
             await erc20Contract.methods.approve(proxy, toWei(String(price), "ether")).send({

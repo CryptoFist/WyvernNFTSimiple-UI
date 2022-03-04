@@ -3,7 +3,7 @@ import { setInterval } from 'timers';
 import './App.scss';
 import SaleModal from './component/modal/sale.modal.component';
 import BuyModal from './component/modal/buy.modal.component';
-import {connectWallet, getOwnedNFT, mintNFT, getOfferedNFT, placeOffering, tradeNFT, closeOffering } from './utils/walletConnect/metamaskConnect';
+import {connectWallet, getOwnedNFT, mintNFT, getOfferedNFT, placeOffering, tradeNFT, closeOffering, setBaseURI } from './utils/walletConnect/metamaskConnect';
 
 function App() {
   const [walletAddress, setWalletAddress] = useState("Connect");
@@ -78,8 +78,10 @@ function App() {
   }
 
   const listSaleOffering = (item) => {
-    setSelectedNFT(item);
-    setSaleModalOpened(true);
+    if (item.sold === false) {
+      setSelectedNFT(item);
+      setSaleModalOpened(true);
+    }
   }
 
   const listBuyOffering = (item) => {
@@ -115,6 +117,7 @@ function App() {
     try {
       alert("Do you want to buy NFT?");
       const succeed = await tradeNFT(selectedNFT.tokenID, selectedNFT.price);
+      console.log(succeed);
       if (succeed === true) {
         await getNFTOffered();
         await getOwnedNFT();
@@ -145,8 +148,8 @@ function App() {
             {
               ownedNFT !== undefined && 
               ownedNFT.map(item => (
-                <li className="sub-item" key={item.tokenID} onClick={() => listSaleOffering(item)}>
-                  <p className="txt-name">{item.title}</p>
+                <li className={item.sold === true ? "sub-item sold" : "sub-item"} key={item.tokenID} onClick={() => listSaleOffering(item)}>
+                  <p className="txt-name">{item.title} {item.sold === true ? " -- listed": ""}</p>
                 </li>
               ))
             }
