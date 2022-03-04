@@ -2,15 +2,14 @@
   "name": "nftui",
   "version": "0.1.0",
   "private": true,
-  "engines": { 
-    "node": "v14.17.1"
-  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.2.1",
     "axios": "^0.25.0",
     "dotenv": "^16.0.0",
+    "ethereumjs-abi": "^0.6.8",
+    "ethereumjs-util": "^7.1.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
